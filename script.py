@@ -1,7 +1,7 @@
 import pandas as pd
 
 # Carregando a planilha. Coloque o arquivo na mesma pasta do script.
-df = pd.read_excel('Metas.xlsx', sheet_name=1) # 'Sheet_name' refere em qual aba o arquivo está. No caso, a segunda aba da planilha.
+df = pd.read_excel('Metas Consultores.xlsx', sheet_name=1) # 'Sheet_name' refere em qual aba o arquivo está. No caso, a segunda aba da planilha.
 
 # Realizando a substituição de valor não-numéricos
 df.replace(['FÉRIAS', 'DESLIGADA', 'LIC. MATER', 'TREINAMENTO'], [0, 0, 0, 0], inplace=True)
@@ -47,4 +47,4 @@ colunas = ['Código', 'Loja', 'Consultor', 'Meta', 'Data', 'Cargo']
 resultado_final = df_empilhado[colunas]
 
 # Salvando o resultado em uma nova planilha
-resultado_final.to_excel('nova_planilha.xlsx', index=False)
+resultado_final.to_excel('planilha_para_BI.xlsx', index=False)
