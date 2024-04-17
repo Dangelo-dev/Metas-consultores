@@ -1,9 +1,21 @@
 import tkinter as tk
-from tkinter import messagebox
 import pandas as pd
-import xlsxwriter
+from datetime import datetime
+from tkcalendar import Calendar
 
+# Criando uma função para escolher a data no calendário
+def selecionar_data():
+    def obter_data_selecionada():
+        data = cal.get_date()
+        data_inicial.set(data)
+        top.destroy()
 
+    top = tk.Toplevel(root)
+    cal = Calendar(top, selectmode='day', day=datetime.now().day, month=datetime.now().month, year=datetime.now().year)
+    cal.pack()
+    tk.Button(top, text='Selecionar Data', command=obter_data_selecionada).pack() #Ao clicar no botão de selecionar data, a janela é fechada e a data selecionada é armazenada na variável data_inicial
+
+# Criando uma função para gerar a planilha
 def gerar_planilha():
     # Carregando a planilha. Coloque o arquivo na mesma pasta do script.
     df = pd.read_excel('Metas Consultores.xlsx', sheet_name=1) # 'Sheet_name' refere em qual aba o arquivo está. No caso, a segunda aba da planilha.
@@ -14,9 +26,10 @@ def gerar_planilha():
 
     # Selecionando as primeiras 3 colunas
     primeiras_3_colunas = df.iloc[:, :3]
-
+    
     # Gerando as datas repetidas
-    datas_repetidas = pd.date_range(start='2024-04-01', periods=int(dias_do_mes.get()))  # ALTERE A DATA INICIAL E O PERÍODO!!!
+    data_inicial_datetime = data_inicial.get()
+    datas_repetidas = pd.date_range(start=data_inicial_datetime, periods=int(dias_do_mes.get()))  # O período é definido de acordo com a opção selecionada
     datas_repetidas = pd.Series(datas_repetidas).dt.strftime('%d/%m/%Y') # Transformar o DatetimeIndex em uma Series e formatar as datas para excluir as informações de hora
     datas_repetidas = pd.Series(datas_repetidas) # Transformar o DatetimeIndex em uma Series
 
@@ -29,7 +42,7 @@ def gerar_planilha():
     # Iterando sobre cada linha do dataframe
     for index, row in df.iterrows():
         # Repetindo as primeiras 3 colunas (Alterar a quantidade de acordo com os dias do mês)
-        primeiras_3_colunas_repetidas = pd.concat([primeiras_3_colunas.iloc[[index]]]*int(dias_do_mes.get()), ignore_index=True) # ALTERE OS DIAS DE ACORDO COM O MÊS!!!!!
+        primeiras_3_colunas_repetidas = pd.concat([primeiras_3_colunas.iloc[[index]]]*int(dias_do_mes.get()), ignore_index=True) # A quantidade de colunas é alterada de acordo com a opção selecionada
         primeiras_3_colunas_repetidas['Dia'] = datas_repetidas.tolist() # Adicionando a coluna de dias
         linhas_empilhadas.extend(primeiras_3_colunas_repetidas.values.tolist()) # Adicionando as primeiras 3 colunas repetidas à lista de linhas empilhadas
 
@@ -59,20 +72,28 @@ def gerar_planilha():
         for i, col in enumerate(df_empilhado.columns):
             column_len = max(df_empilhado[col].astype(str).map(len).max(), len(str(col))) + 2  # Adiciona uma margem de 2 caracteres
             worksheet_empilhado.set_column(i, i, column_len)
-    root.destroy() 
+    root.destroy() # Fecha a janela de interação após clicar em "Gerar Planilha"
+    pass 
 
+# Criando uma janela para interação
 root = tk.Tk()
 root.title('Gerador de Planilha')
 
+# cria a variável para alterar a quantidade de dias no mês, dentro das variáveis 'datas_repetidas' e 'primeiras_3_colunas_repetidas'
 dias_do_mes = tk.IntVar()
-dias_do_mes.set(30)
 
 tk.Label(root, text='Quantos dias tem  mês?').pack()
 
+# Criando 3 opções de botão para que o usuario selecione a quantidade de dias no mes correspondente
 tk.Radiobutton(root, text='28', variable=dias_do_mes, value=28).pack()
 tk.Radiobutton(root, text='30', variable=dias_do_mes, value=30).pack()
 tk.Radiobutton(root, text='31', variable=dias_do_mes, value=31).pack()
 
-tk.Button(root, text='Gerar Planilha', command=gerar_planilha).pack()
+# Criando uma variável para armazenar a data inicial
+data_inicial = tk.StringVar()
+data_inicial.set(datetime.now().strftime('%d/%m/%Y'))
+
+tk.Button(root, text='Selecionar Data', command=selecionar_data).pack()  # Botão para selecionar a data inicial
+tk.Button(root, text='Gerar Planilha', command=gerar_planilha).pack() # Botão para gerar a planilha
 
 root.mainloop()
