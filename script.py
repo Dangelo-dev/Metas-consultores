@@ -75,8 +75,6 @@ root.title('Gerador de Planilha')
 
 dias_do_mes = tk.IntVar()
 
-tk.Button(root, text='Selecionar arquivo', command=selecionar_arquivo).pack() 
-
 tk.Label(root, text='Quantos dias tem o mês?').pack()
 
 tk.Radiobutton(root, text='28', variable=dias_do_mes, value=28).pack()
@@ -86,6 +84,7 @@ tk.Radiobutton(root, text='31', variable=dias_do_mes, value=31).pack()
 data_inicial = tk.StringVar()
 data_inicial.set(datetime.now().strftime('%d/%m/%Y'))
 
+tk.Button(root, text='Selecionar arquivo', command=selecionar_arquivo).pack() 
 tk.Button(root, text='Selecionar data inicial', command=selecionar_data).pack()
 tk.Button(root, text='Gerar Planilha', command=gerar_planilha).pack()
 
