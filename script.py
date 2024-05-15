@@ -2,23 +2,17 @@ import tkinter as tk
 from tkinter import filedialog, messagebox
 import pandas as pd
 from datetime import datetime
-from tkcalendar import Calendar
 
 # Variável global para armazenar o DataFrame após a seleção do arquivo
 df = None
+data_inicial = None
 
-def selecionar_data():
-    def obter_data_selecionada():
-        data = cal.get_date()
-        data_inicial.set(data)
-        top.destroy()
+def definir_data_inicial():
+    global data_inicial
+    data_atual = datetime.now()
+    data_inicial = datetime(data_atual.year, data_atual.month, 1) # Definindo o dia padrão como 01, e o mês e ano de acordo com o atual
+    data_inicial.strftime('%d/%m/%Y') # Formatando a data para dia/mês/ano
 
-    top = tk.Toplevel(root)
-    cal = Calendar(top, selectmode='day', day=datetime.now().day, month=datetime.now().month, year=datetime.now().year)
-    cal.pack()
-    tk.Button(top, text='Selecionar Data', command=obter_data_selecionada).pack()
-
-# Função para selecionar o arquivo
 def selecionar_arquivo():
     global df
     arquivo = filedialog.askopenfilename(filetypes=[("Arquivos Excel", "*.xlsx"), ("Todos os arquivos", "*.*")])
@@ -28,18 +22,17 @@ def selecionar_arquivo():
         except Exception as e:
             messagebox.showerror("Erro ao abrir arquivo", f"Ocorreu um erro ao abrir o arquivo:\n{str(e)}")
 
-# Função para gerar a planilha
 def gerar_planilha():
     global df
     if df is not None:
+        definir_data_inicial()
         # Substituindo valores não-numéricos do DataFrame
         pd.set_option('future.no_silent_downcasting', True)
-        df.replace(['FÉRIAS', 'DESLIGADA', 'LIC. MATER', 'TREINAMENTO'], [0,0,0,0], inplace=True)
+        df.replace(['FÉRIAS', 'DESLIGADA', 'LIC. MATER', 'TREINAMENTO', 'AFASTADA'], [0,0,0,0,0], inplace=True)
         df.fillna(0, inplace=True) # Converte célula vazia para '0'
 
         primeiras_3_colunas = df.iloc[:, :3]
-        data_inicial_datetime = data_inicial.get()
-        datas_repetidas = pd.date_range(start=data_inicial_datetime, periods=int(dias_do_mes.get()))
+        datas_repetidas = pd.date_range(start=data_inicial, periods=int(dias_do_mes.get()))
         datas_repetidas = pd.Series(datas_repetidas).dt.strftime('%d/%m/%Y')
         datas_repetidas = pd.Series(datas_repetidas)
 
@@ -81,11 +74,7 @@ tk.Radiobutton(root, text='28', variable=dias_do_mes, value=28).pack()
 tk.Radiobutton(root, text='30', variable=dias_do_mes, value=30).pack()
 tk.Radiobutton(root, text='31', variable=dias_do_mes, value=31).pack()
 
-data_inicial = tk.StringVar()
-data_inicial.set(datetime.now().strftime('%d/%m/%Y'))
-
 tk.Button(root, text='Selecionar arquivo', command=selecionar_arquivo).pack() 
-tk.Button(root, text='Selecionar data inicial', command=selecionar_data).pack()
 tk.Button(root, text='Gerar Planilha', command=gerar_planilha).pack()
 
 root.mainloop()
