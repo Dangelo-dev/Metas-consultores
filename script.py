@@ -6,6 +6,8 @@ from datetime import datetime
 # Variável global para armazenar o DataFrame após a seleção do arquivo
 df = None
 data_inicial = None
+list_range = None
+
 
 def definir_data_inicial():
     global data_inicial
@@ -15,10 +17,13 @@ def definir_data_inicial():
 
 def selecionar_arquivo():
     global df
+    global list_range
     arquivo = filedialog.askopenfilename(filetypes=[("Arquivos Excel", "*.xlsx"), ("Todos os arquivos", "*.*")])
     if arquivo:
         try:
-            df = pd.read_excel(arquivo, sheet_name=1)
+            list_range = dias_do_mes.get() + 5 # variavel para adicionar 5 colunas de acordo com o período selecionado
+            df = pd.read_excel(arquivo, sheet_name=0, usecols=[0,1,3] + list(range(5, list_range))) # usando somente as colunas que interessam
+            print(df)
         except Exception as e:
             messagebox.showerror("Erro ao abrir arquivo", f"Ocorreu um erro ao abrir o arquivo:\n{str(e)}")
 
@@ -67,6 +72,7 @@ root = tk.Tk()
 root.title('Gerador de Planilha')
 
 dias_do_mes = tk.IntVar()
+list_range = dias_do_mes.get() + 5
 
 tk.Label(root, text='Quantos dias tem o mês?').pack()
 
