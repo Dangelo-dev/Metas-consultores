@@ -1,7 +1,8 @@
-import tkinter as tk
 from tkinter import filedialog, messagebox
+import customtkinter as ctk
 import pandas as pd
 from datetime import datetime
+from PIL import Image
 
 # Variável global para armazenar o DataFrame após a seleção do arquivo
 df = None
@@ -23,7 +24,6 @@ def selecionar_arquivo():
         try:
             list_range = dias_do_mes.get() + 5 # variavel para adicionar 5 colunas de acordo com o período selecionado
             df = pd.read_excel(arquivo, sheet_name=0, usecols=[0,1,3] + list(range(5, list_range))) # usando somente as colunas que interessam
-            print(df)
         except Exception as e:
             messagebox.showerror("Erro ao abrir arquivo", f"Ocorreu um erro ao abrir o arquivo:\n{str(e)}")
 
@@ -68,19 +68,28 @@ def gerar_planilha():
         except Exception as e:
             messagebox.showerror("Erro ao gerar planilha", f"Ocorreu um erro ao gerar a planilha:\n{str(e)}")
 
-root = tk.Tk()
-root.title('Gerador de Planilha')
+# Criando a interface
+root = ctk.CTk()
+root.geometry("350x250")
+root.title('Conversor de metas consultores')
 
-dias_do_mes = tk.IntVar()
-list_range = dias_do_mes.get() + 5
+# Aplicando fundo ao aplicativo
+fundo = Image.open("fundo.jpg")
+background_image = ctk.CTkImage(fundo, size=(350, 250))
+bg_label = ctk.CTkLabel(root, text="", image=background_image)
+bg_label.place(x=0, y=0)
 
-tk.Label(root, text='Quantos dias tem o mês?').pack()
 
-tk.Radiobutton(root, text='28', variable=dias_do_mes, value=28).pack()
-tk.Radiobutton(root, text='30', variable=dias_do_mes, value=30).pack()
-tk.Radiobutton(root, text='31', variable=dias_do_mes, value=31).pack()
+dias_do_mes = ctk.IntVar()
+dias_do_mes.set(30) # definido um valor padrão para evitar problemas com valor não definido
 
-tk.Button(root, text='Selecionar arquivo', command=selecionar_arquivo).pack() 
-tk.Button(root, text='Gerar Planilha', command=gerar_planilha).pack()
+ctk.CTkLabel(root, text='Quantos dias tem o mês?', bg_color="#70967E", text_color="black").pack(anchor='center')
+
+ctk.CTkRadioButton(root, text='28', variable=dias_do_mes, value=28, bg_color="#70967E", text_color="black", fg_color="#007e78", hover_color="#93DA49").pack(pady=5, anchor='center')
+ctk.CTkRadioButton(root, text='30', variable=dias_do_mes, value=30, bg_color="#70967E", text_color="black", fg_color="#007e78", hover_color="#93DA49").pack(pady=5, anchor='center')
+ctk.CTkRadioButton(root, text='31', variable=dias_do_mes, value=31, bg_color="#70967E", text_color="black", fg_color="#007e78", hover_color="#93DA49").pack(pady=5, anchor='center')
+
+ctk.CTkButton(root, text='Selecionar arquivo', command=selecionar_arquivo, bg_color="#007E78", fg_color="#007e78", text_color="black", hover_color="#93DA49").pack(pady=15, anchor='center') 
+ctk.CTkButton(root, text='Gerar Planilha', command=gerar_planilha, bg_color="#007E78", fg_color="#007e78", text_color="black", hover_color="#93DA49").pack(pady=5, anchor='center')
 
 root.mainloop()
