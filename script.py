@@ -4,7 +4,7 @@ import pandas as pd
 from datetime import datetime
 from PIL import Image
 
-# Variável global para armazenar o DataFrame após a seleção do arquivo
+# Variáveis globais
 df = None
 data_inicial = None
 list_range = None
@@ -14,7 +14,6 @@ def definir_data_inicial():
     global data_inicial
     data_atual = datetime.now()
     data_inicial = datetime(data_atual.year, data_atual.month, 1) # Definindo o dia padrão como 01, e o mês e ano de acordo com o atual
-    data_inicial.strftime('%d/%m/%Y') # Formatando a data para dia/mês/ano
 
 def selecionar_arquivo():
     global df
