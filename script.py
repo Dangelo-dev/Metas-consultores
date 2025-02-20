@@ -2,7 +2,6 @@ from tkinter import filedialog, messagebox
 import customtkinter as ctk
 import pandas as pd
 from datetime import datetime
-from PIL import Image
 
 # Variáveis globais
 df = None
@@ -69,26 +68,20 @@ def gerar_planilha():
 
 # Criando a interface
 root = ctk.CTk()
-root.geometry("350x250")
+root.geometry("350x300")
 root.title('Conversor de metas consultores')
-
-# Aplicando fundo ao aplicativo
-fundo = Image.open("fundo.jpg")
-background_image = ctk.CTkImage(fundo, size=(350, 250))
-bg_label = ctk.CTkLabel(root, text="", image=background_image)
-bg_label.place(x=0, y=0)
-
+root.config(bg="lightgreen")
 
 dias_do_mes = ctk.IntVar()
 dias_do_mes.set(30) # definido um valor padrão para evitar problemas com valor não definido
 
-ctk.CTkLabel(root, text='Quantos dias tem o mês?', bg_color="#70967E", text_color="black").pack(anchor='center')
+ctk.CTkLabel(root, text='Quantos dias tem o mês?', bg_color="lightgreen", text_color="black").pack(pady=10)
 
-ctk.CTkRadioButton(root, text='28', variable=dias_do_mes, value=28, bg_color="#70967E", text_color="black", fg_color="#007e78", hover_color="#93DA49").pack(pady=5, anchor='center')
-ctk.CTkRadioButton(root, text='30', variable=dias_do_mes, value=30, bg_color="#70967E", text_color="black", fg_color="#007e78", hover_color="#93DA49").pack(pady=5, anchor='center')
-ctk.CTkRadioButton(root, text='31', variable=dias_do_mes, value=31, bg_color="#70967E", text_color="black", fg_color="#007e78", hover_color="#93DA49").pack(pady=5, anchor='center')
+ctk.CTkRadioButton(root, text='28', variable=dias_do_mes, value=28, bg_color="lightgreen", text_color="black", fg_color="green", hover_color="#93DA49").pack(pady=5)
+ctk.CTkRadioButton(root, text='30', variable=dias_do_mes, value=30, bg_color="lightgreen", text_color="black", fg_color="green", hover_color="#93DA49").pack(pady=5)
+ctk.CTkRadioButton(root, text='31', variable=dias_do_mes, value=31, bg_color="lightgreen", text_color="black", fg_color="green", hover_color="#93DA49").pack(pady=5)
 
-ctk.CTkButton(root, text='Selecionar arquivo', command=selecionar_arquivo, bg_color="#007E78", fg_color="#007e78", text_color="black", hover_color="#93DA49").pack(pady=15, anchor='center') 
-ctk.CTkButton(root, text='Gerar Planilha', command=gerar_planilha, bg_color="#007E78", fg_color="#007e78", text_color="black", hover_color="#93DA49").pack(pady=5, anchor='center')
+ctk.CTkButton(root, text='Selecionar arquivo', command=selecionar_arquivo, bg_color="green", fg_color="green", text_color="white", hover_color="green").pack(pady=15) 
+ctk.CTkButton(root, text='Gerar Planilha', command=gerar_planilha, bg_color="green", fg_color="green", text_color="white", hover_color="green").pack()
 
 root.mainloop()
