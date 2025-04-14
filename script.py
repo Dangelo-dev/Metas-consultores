@@ -1,13 +1,14 @@
-from tkinter import filedialog, messagebox
 import customtkinter as ctk
 import pandas as pd
+import os
+from tkinter import filedialog, messagebox
 from datetime import datetime
 
 # Variáveis globais
 df = None
 data_inicial = None
 list_range = None
-
+arquivo_base = None
 
 def definir_data_inicial():
     global data_inicial
@@ -17,21 +18,24 @@ def definir_data_inicial():
 def selecionar_arquivo():
     global df
     global list_range
-    arquivo = filedialog.askopenfilename(filetypes=[("Arquivos Excel", "*.xlsx"), ("Todos os arquivos", "*.*")])
-    if arquivo:
+    global arquivo_base
+    arquivo_base = filedialog.askopenfilename(filetypes=[("Arquivos Excel", "*.xlsx"), ("Todos os arquivos", "*.*")])
+    if arquivo_base:
         try:
             list_range = dias_do_mes.get() + 5 # variavel para adicionar 5 colunas de acordo com o período selecionado
-            df = pd.read_excel(arquivo, sheet_name=0, usecols=[0,1,3] + list(range(5, list_range))) # usando somente as colunas que interessam
+            df = pd.read_excel(arquivo_base, sheet_name=0, usecols=[0,1,3] + list(range(5, list_range))) # usando somente as colunas que interessam
         except Exception as e:
             messagebox.showerror("Erro ao abrir arquivo", f"Ocorreu um erro ao abrir o arquivo:\n{str(e)}")
 
 def gerar_planilha():
     global df
+    global arquivo_base
+
     if df is not None:
         definir_data_inicial()
         # Substituindo valores não-numéricos do DataFrame
         pd.set_option('future.no_silent_downcasting', True)
-        df.replace(['FÉRIAS', 'DESLIGADA', 'LIC. MATER', 'TREINAMENTO', 'AFASTADA'], [0,0,0,0,0], inplace=True)
+        df.replace(['FÉRIAS', 'DESLIGADA', 'DESLIGADO', 'LIC. MATER', 'TREINAMENTO', 'AFASTADA', '-'], [0,0,0,0,0,0,0], inplace=True)
         df.fillna(0, inplace=True) # Converte célula vazia para '0'
 
         primeiras_3_colunas = df.iloc[:, :3]
@@ -53,16 +57,22 @@ def gerar_planilha():
         df_empilhado['Cargo'] = 'Vendedor'
         colunas = ['Cód.', 'Loja', 'Consultores', 'Meta', 'Dia', 'Cargo']
         resultado_final = df_empilhado[colunas]
+
+    if arquivo_base:
+        pasta_destino = os.path.dirname(arquivo_base)
+        mes_ano = data_inicial.strftime("%m-%Y")
+        nome_arquivo = f"TI.METAS.LOJAS.BH.META PARA BI.{mes_ano}.xlsx"
+        caminho_saida = os.path.join(pasta_destino, nome_arquivo)
         
         try:
-            with pd.ExcelWriter('Meta para BI.xlsx', engine='xlsxwriter') as writer:
+            with pd.ExcelWriter(caminho_saida, engine='xlsxwriter') as writer:
                 resultado_final.to_excel(writer, index=False, sheet_name='Metas Consultores')
                 worksheet_empilhado = writer.sheets['Metas Consultores']
                 for i, col in enumerate(df_empilhado.columns):
                     column_len = max(df_empilhado[col].astype(str).map(len).max(), len(str(col))) + 2
                     worksheet_empilhado.set_column(i, i, column_len)
             root.destroy()
-            messagebox.showinfo("Sucesso", "Planilha gerada com sucesso!")
+            messagebox.showinfo("Sucesso!", f"Arquivo salvo com sucesso em: \n{caminho_saida}")
         except Exception as e:
             messagebox.showerror("Erro ao gerar planilha", f"Ocorreu um erro ao gerar a planilha:\n{str(e)}")
 
